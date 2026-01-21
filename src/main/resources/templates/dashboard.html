@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Admin Dashboard - Invoice Score System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: fixed;
+            width: 280px;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            padding-left: 20px;
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .logout-btn {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .action-buttons {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-buttons-small {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-view {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .close {
+            color: #999;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-cancel:hover {
+            background: #dee2e6;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+                padding: 20px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .stat-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Invoice Score</h2>
+            <p>Admin Panel</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="nav-link active" data-page="overview"><i class="fas fa-chart-line"></i>Dashboard</a>
+            </li>
+            <li><a href="#" class="nav-link" data-page="depots"><i class="fas fa-building"></i>Depots</a></li>
+            <li><a href="#" class="nav-link logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Overview Page -->
+        <div id="overviewPage" class="page">
+            <div class="page-header">
+                <h1>Dashboard Overview</h1>
+                <p>Welcome to Invoice Score System</p>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-building"></i></div>
+                        <div class="stat-value" id="totalDepots">0</div>
+                        <div class="stat-label">Total Depots</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-file-invoice"></i></div>
+                        <div class="stat-value" id="totalInvoices">0</div>
+                        <div class="stat-label">Total Invoices</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-money-bill"></i></div>
+                        <div class="stat-value" id="totalAmount">0</div>
+                        <div class="stat-label">Total Amount (៛)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Depots Page -->
+        <div id="depotsPage" class="page" style="display: none;">
+            <div class="page-header">
+                <h1>Depot Management</h1>
+                <p>Manage all depots</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" id="addDepotBtn"><i class="fas fa-plus"></i> Add Depot</button>
+            </div>
+
+            <div class="table-container">
+                <table class="table" id="depotsTable">
+                    <thead>
+                        <tr>
+                            <th>Depot Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Depot Modal -->
+    <div id="depotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="depotModalTitle">Add Depot</h2>
+                <span class="close" id="closeDepotModal">&times;</span>
+            </div>
+            <form id="depotForm">
+                <div class="form-group">
+                    <label>Depot Name *</label>
+                    <input type="text" id="depotName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="depotPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <input type="text" id="depotAddress" required>
+                </div>
+                <div class="form-group">
+                    <label>Additional Info</label>
+                    <textarea id="depotAdditionalInfo" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Remaining Score</label>
+                    <input type="number" id="depotRemainingScore" min="0" step="1" value="0">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" id="cancelDepotBtn">Cancel</button>
+                    <button type="submit" class="btn-save">Save Depot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentDepotId = null;
+
+        // Navigation
+        document.querySelectorAll('.nav-link:not(.logout-btn)').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.currentTarget.getAttribute('data-page');
+                showPage(page);
+
+                document.querySelectorAll('.nav-link:not(.logout-btn)').forEach(l => l.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(page + 'Page').style.display = 'block';
+
+            if (page === 'depots') {
+                loadDepots();
+            } else if (page === 'overview') {
+                loadDashboardStats();
+            }
+        }
+
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const data = await response.json();
+                document.getElementById('totalDepots').textContent = data.totalDepots;
+                document.getElementById('totalInvoices').textContent = data.totalInvoices;
+                document.getElementById('totalAmount').textContent = formatCurrency(data.totalAmount);
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        // Load depots
+        async function loadDepots() {
+            try {
+                const response = await fetch('/api/depots');
+                const depots = await response.json();
+                const tbody = document.querySelector('#depotsTable tbody');
+                tbody.innerHTML = '';
+
+                depots.forEach(depot => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${depot.name}</td>
+                        <td>${depot.phone}</td>
+                        <td>${depot.address}</td>
+                        <td>${formatDate(depot.createdDate)}</td>
+                        <td>
+                            <div class="action-buttons-small">
+                                <button class="btn-sm btn-view" onclick="viewDepot('${depot.id}')">View</button>
+                                <button class="btn-sm btn-edit" onclick="editDepot('${depot.id}')">Edit</button>
+                                <button class="btn-sm btn-delete" onclick="deleteDepot('${depot.id}')">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading depots:', error);
+            }
+        }
+
+        // Add depot button
+        document.getElementById('addDepotBtn').addEventListener('click', () => {
+            currentDepotId = null;
+            document.getElementById('depotModalTitle').textContent = 'Add Depot';
+            document.getElementById('depotForm').reset();
+            document.getElementById('depotModal').classList.add('show');
+        });
+
+        // Edit depot
+        async function editDepot(depotId) {
+            try {
+                const response = await fetch(`/api/depots/${depotId}`);
+                const depot = await response.json();
+
+                currentDepotId = depotId;
+                document.getElementById('depotModalTitle').textContent = 'Edit Depot';
+                document.getElementById('depotName').value = depot.name;
+                document.getElementById('depotPhone').value = depot.phone;
+                document.getElementById('depotAddress').value = depot.address;
+                document.getElementById('depotAdditionalInfo').value = depot.additionalInfo || '';
+                document.getElementById('depotModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading depot:', error);
+            }
+        }
+
+        // View depot
+        function viewDepot(depotId) {
+            window.location.href = `/depots/${depotId}`;  // PLURAL: /depots/
+        }
+        // Delete depot
+        async function deleteDepot(depotId) {
+            if (!confirm('Are you sure you want to delete this depot?')) return;
+
+            try {
+                await fetch(`/api/depots/${depotId}`, { method: 'DELETE' });
+                loadDepots();
+            } catch (error) {
+                console.error('Error deleting depot:', error);
+            }
+        }
+
+        // Depot form submit
+        document.getElementById('depotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // In the depot form submit event listener
+            const depotData = {
+                name: document.getElementById('depotName').value,
+                phone: document.getElementById('depotPhone').value,
+                address: document.getElementById('depotAddress').value,
+                additionalInfo: document.getElementById('depotAdditionalInfo').value,
+                remainingScore: parseInt(document.getElementById('depotRemainingScore').value) || 0 // NEW
+            };
+
+            try {
+                const url = currentDepotId ? `/api/depots/${currentDepotId}` : '/api/depots';
+                const method = currentDepotId ? 'PUT' : 'POST';
+
+                await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(depotData)
+                });
+
+                document.getElementById('depotModal').classList.remove('show');
+                loadDepots();
+            } catch (error) {
+                console.error('Error saving depot:', error);
+            }
+        });
+
+        // Modal close buttons
+        document.getElementById('closeDepotModal').addEventListener('click', () => {
+            document.getElementById('depotModal').classList.remove('show');
+        });
+
+        document.getElementById('cancelDepotBtn').addEventListener('click', () => {
+            document.getElementById('depotModal').classList.remove('show');
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/login';
+        });
+
+        // Utility functions
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'decimal',
+                minimumFractionDigits: 0
+            }).format(amount || 0);
+        }
+
+        // Load dashboard on page load
+        window.addEventListener('load', () => {
+            loadDashboardStats();
+        });
+
+        // Check authentication on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/api/auth/check', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (!data.success) {
+                    // Not authenticated, redirect to login
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/login';
+            }
+        });
+    </script>
+    <!-- Add ?v=1.1 to force cache refresh -->
+    <script src="/js/app.js?v=1.1"></script>
+</body>
+
+</html>
